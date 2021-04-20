@@ -32,9 +32,14 @@ public class Player : MonoBehaviour
             Jump();
         }
         
-        if (Input.GetButtonDown("Fire1"))
+        if (isGrounded && Input.GetButtonDown("Fire1"))
         {
             Attack();
+        }
+        
+        if (!isGrounded && Input.GetButtonDown("Fire1"))
+        {
+            FallingAttack();
         }
     }
 
@@ -122,6 +127,11 @@ public class Player : MonoBehaviour
         {
             animator.SetTrigger("Attack1");
         }
+    }
+
+    private void FallingAttack()
+    {
+        animator.SetTrigger("FallingAttack");
     }
     
     bool IsPlaying(Animator anim, string stateName)

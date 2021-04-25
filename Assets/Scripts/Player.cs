@@ -5,34 +5,37 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private Rigidbody2D rigidbody;
+    [SerializeField] private Rigidbody2D rigidbody; //variabilele marcate prin serializefield sunt private, dar pot fi vazute in inspector
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float jumpPower = 5f;
     [SerializeField] private bool isActive;
     
-    private Animator animator;
+    private Animator animator; //variabilele private nu pot fi vazute in inspector
     private SpriteRenderer spriteRenderer;
     private float horizontal;
     private bool isFacingRight;
     private bool isGrounded;
     private int animLayer = 0;
-    private void Awake()
+    private bool canDoubleJump;
+    private float pushForce = 10;
+    private Vector2 pushDirection;
+    private void Awake()   //instructiunile din awake se realizeaza inainte ca jocul sa se porneasca
     {
-        rigidbody = GetComponent<Rigidbody2D>();
+        rigidbody = GetComponent<Rigidbody2D>(); //facem referinta variabilei la componenta care se afla pe obiectul scriptului
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         isActive = true;
         isFacingRight = true;
     }
 
-    private void Update()
+    private void Update()   //instructiunile din update au loc in fiecare frame
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump"))  //atunci cand tastam butonul Space (in editorul unity "Jump")
         {
             Jump();
         }
         
-        if (isGrounded && Input.GetButtonDown("Fire1"))
+        if (isGrounded && Input.GetButtonDown("Fire1"))  //daca playerul este pe pamant si este tastat butonul Ctrl sau Right Mouse
         {
             Attack();
         }
@@ -43,15 +46,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate() //asemanator cu Update, dar nu este legat de frame-uri
     {
-        if (isGrounded)
-        {
-            horizontal = Input.GetAxis("Horizontal") * moveSpeed;
-        }
-
         if (isActive)
         {
+            if (isGrounded)
+            {
+                horizontal = Input.GetAxis("Horizontal") * moveSpeed;  //horizontal primeste directia de miscare pe axa orizontala inmultita cu viteza pe care o setam la alegere
+            }
+            
             Move();
             Flip();
 
@@ -88,12 +91,21 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             rigidbody.velocity = new Vector2(horizontal, jumpPower);
-            animator.SetTrigger("Jumping");
+            animator.SetBool("Jumping", true);
+            canDoubleJump = true;
         }
+        else if (canDoubleJump)
+        {
+            rigidbody.velocity = new Vector2(horizontal, jumpPower);
+            animator.SetBool("Jumping", true);
+            canDoubleJump = false;
+        }
+        
     }
 
     private void Fall()
     {
+        animator.SetBool("Jumping", false);
         animator.SetBool("Falling", true);
     }
 
@@ -144,6 +156,32 @@ public class Player : MonoBehaviour
     }
 
     private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.transform.tag == "Ground")
+        {
+            isGrounded = true;
+            animator.SetBool("Falling", false);
+        }
+
+        if (other.transform.tag == "Spikes")
+        {
+            animator.SetTrigger("GetHit");
+
+            if (isFacingRight)
+            {
+                pushDirection = Vector2.left;
+            }
+            else
+            {
+                pushDirection = Vector2.right;
+            }
+            pushDirection = pushDirection.normalized;
+            
+            rigidbody.velocity = pushDirection * pushForce;
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D other)
     {
         if (other.transform.tag == "Ground")
         {

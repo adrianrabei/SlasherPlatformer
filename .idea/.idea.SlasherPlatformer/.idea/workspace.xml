@@ -16,6 +16,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/Assets/Scripts/Cube.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Player.cs" />
       </list>
     </option>
@@ -63,6 +64,9 @@
       <workItem from="1617640506356" duration="8117000" />
       <workItem from="1618479114825" duration="2536000" />
       <workItem from="1618949370506" duration="4803000" />
+      <workItem from="1619037483165" duration="23000" />
+      <workItem from="1619273548047" duration="2034000" />
+      <workItem from="1619305778119" duration="5685000" />
     </task>
     <servers />
   </component>
